@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require(".");
-
-const LikeRes = sequelize.define(
+module.exports = (sequelize) => {
+  return sequelize.define(
   "LikeRes",
   {
     userId: {
@@ -20,14 +19,11 @@ const LikeRes = sequelize.define(
     dateLike: {
       type: DataTypes.DATE,
       field: "date_like",
-    },
-   
-    
+    }, 
   },
   {
     tableName: "like_res",
     timestamps: false,    
   }
 );
-
-module.exports = LikeRes;
+}

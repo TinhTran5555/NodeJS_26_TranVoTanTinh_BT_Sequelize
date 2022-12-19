@@ -1,13 +1,14 @@
 const likeResService = require("../services/likeRes.service");
+const { response } = require("../helpers/response");
 
 const getLikesByUserId = () => {
   return async (req, res) => {
     try {
       const { userId } = req.params;
       const likes = await likeResService.getLikesByUserId(userId);
-      res.status(200).json({ data: likes });
+      res.status(200).json(likes);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      next(error);
     }
   };
 };
@@ -16,38 +17,30 @@ const getLikesByResId = () => {
     try {
       const { resId } = req.params;
       const likes = await likeResService.getLikesByResId(resId);
-      res.status(200).json({ data: likes });
+      res.status(200).json(likes);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      next(error);
     }
   };
 };
-const createLike = () => {
-    return async (req, res) => {
-      try {
-        const like = req.body;
-        const createdLike = await likeResService.createLike(like);
-        res.status(200).json({ data: createdLike });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    };
+
+// POST localhost:4000/restaurants/:userId/like/resId - body: {dateLike: "2022-22-10"}
+const likeRestaurant = () => {
+  return async (req, res, next) => {
+    try {
+      const { userId, resId } = req.params;
+      const { dateLike } = req.body
+      await likeResService.likeRestaurant(userId, resId, dateLike);
+      res.status(200).json(response("OK"));
+    } catch (error) {
+      
+      next(error);
+    }
   };
-  const deleteLike = () => {
-    return async (req, res) => {      
-      try {
-        const { userId, resId  } = req.params;
-        await likeResService.deleteLike(userId,resId );
-        res.status(200).json({ data: true });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    };
-  };
- 
-  module.exports = {
-    createLike,
-    deleteLike,
-    getLikesByUserId,
-    getLikesByResId
-  };
+};
+module.exports = {
+
+  getLikesByUserId,
+  getLikesByResId,
+  likeRestaurant
+};

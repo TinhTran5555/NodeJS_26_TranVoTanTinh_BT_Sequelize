@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require(".");
 
-const Order = sequelize.define(
+module.exports = (sequelize) => {
+ return sequelize.define(
   "Order",
   {
     userId: {
@@ -33,5 +33,4 @@ const Order = sequelize.define(
     timestamps: false,    
   }
 );
-
-module.exports = Order;
+}

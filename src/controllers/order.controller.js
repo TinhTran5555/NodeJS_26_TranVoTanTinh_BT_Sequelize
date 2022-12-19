@@ -1,13 +1,15 @@
 const orderService = require("../services/order.service");
+const { response } = require("../helpers/response");
 
 const createOrder = () => {
-    return async (req, res) => {
+    return async (req, res, next) => {
       try {
-        const order = req.body;
-        const createdOrder = await orderService.createOrder(order);
-        res.status(200).json({ data: createdOrder });
+        const { userId, foodId } = req.params;
+      const { amount, code, arrSubId } = req.body
+       await orderService.createOrder(userId , foodId, amount, code, arrSubId);
+       res.status(200).json(response("OK"));
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
       }
     };
   };

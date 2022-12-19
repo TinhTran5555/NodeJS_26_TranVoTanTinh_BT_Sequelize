@@ -1,67 +1,81 @@
-const LikeRes = require("../models/LikeRes");
+
+const { AppError } = require("../helpers/error");
+
+const { Restaurant, User } = require("../models");
+
 
 const getLikesByUserId = async (userId) => {
   try {
-    const likes = await LikeRes.findAll(
+    const userLikes = await User.findAll(
       {
         where: {
           userId: userId,
         },
+        include:
+        {
+          association: "userLike",
+        },
+        attributes: {
+          exclude: ["password"],
+        },
       }
     );
-    return likes;
+    return userLikes;
   } catch (error) {
     throw error;
   }
 };
 const getLikesByResId = async (resId) => {
   try {
-    const likes = await LikeRes.findAll(
+    const restaurantLikes = await Restaurant.findAll(
       {
         where: {
           resId: resId,
         },
+        include:
+        {
+          association: "restaurantLike",
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+
       }
     );
-    return likes;
+    return restaurantLikes;
   } catch (error) {
     throw error;
   }
 };
-const createLike = async (data) => {
-    try {
-    
-      const createdLike = await LikeRes.create(data);
-      return createdLike;
-    } catch (error) {
-      throw error;
-    }
-  };
-  const deleteLike = async (userId,resId ) => {
-    
 
-    try {
-      const like = await LikeRes.findOne({
-        where: {
-          userId: userId,
-          resId : resId
-
-        },
-      });
-      if (!like) {
-        throw new Error("Liked not found");
-      }
-      console.log(like);
-      await LikeRes.destroy({ where: {  userId: userId,
-        resId : resId } });
-    } catch (error) {
-      throw error
+const likeRestaurant = async (userId, resId, dateLike) => {
+  try {
+    const restaurant = await Restaurant.findByPk(resId);
+    if (!restaurant) {
+      throw new AppError(400, "Restaurant not found");
     }
-  };
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new AppError(400, "User not found");
+    }
+    console.log(restaurant.__proto__);
+    const hasLiked = await restaurant.hasUserLike(user.userId);
+
+    if (hasLiked) {
+      await restaurant.removeUserLike(user.userId);
+    } else {
+      await restaurant.addUserLike(user.userId, { through: { dateLike: dateLike } });
+    }
+
+    return null;
+  } catch (error) {
+
+    throw error;
+  }
+};
 
 module.exports = {
-    createLike,
-    deleteLike,
-    getLikesByUserId,
-    getLikesByResId
-  };
+  getLikesByUserId,
+  getLikesByResId,
+  likeRestaurant
+};

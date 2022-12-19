@@ -1,23 +1,14 @@
 const rateResService = require("../services/rateRes.service");
-const createRate = () => {
-    return async (req, res) => {
-      try {
-        const like = req.body;
-        const createdRate = await rateResService.createRate(like);
-        res.status(200).json({ data: createdRate });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    };
-  };
+const { response } = require("../helpers/response");
+
   const getRatesByUserId = () => {
     return async (req, res) => {
       try {
         const { userId } = req.params;
         const likes = await rateResService.getRatesByUserId(userId);
-        res.status(200).json({ data: likes });
+        res.status(200).json(response(likes));
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
       }
     };
   };
@@ -26,14 +17,28 @@ const createRate = () => {
       try {
         const { resId } = req.params;
         const likes = await rateResService.getRatesByResId(resId);
-        res.status(200).json({ data: likes });
+        res.status(200).json(response(likes));
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
+      }
+    };
+  };
+  // POST localhost:4000/restaurants/:userId/rate/resId - body: {amount: "5", dateLike: "2022-22-10"}
+  const rateRestaurant = () => {
+    return async (req, res, next) => {
+      try {
+        const { userId, resId } = req.params;
+        const { amount, dateRate } = req.body
+        await rateResService.rateRestaurant(userId, resId,amount , dateRate );
+        res.status(200).json(response("OK"));
+      } catch (error) {
+        
+        next(error);
       }
     };
   };
   module.exports = {
-    createRate,
+    rateRestaurant,
     getRatesByUserId,
     getRatesByResId
   };

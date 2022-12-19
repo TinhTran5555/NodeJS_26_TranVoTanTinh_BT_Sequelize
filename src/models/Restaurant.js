@@ -1,7 +1,8 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require(".");
 
-const Restaurant = sequelize.define(
+
+module.exports = (sequelize) => {
+  return sequelize.define(
   "Restaurant",
   {
     resId: {
@@ -30,4 +31,4 @@ const Restaurant = sequelize.define(
   }
 );
 
-module.exports = Restaurant;
+}
