@@ -59,12 +59,12 @@ const likeRestaurant = async (userId, resId, dateLike) => {
       throw new AppError(400, "User not found");
     }
     console.log(restaurant.__proto__);
-    const hasLiked = await restaurant.hasUserLike(user.userId);
+    const hasLiked = await restaurant.hasRestaurantLike(user.userId);
 
     if (hasLiked) {
-      await restaurant.removeUserLike(user.userId);
+      await restaurant.removeRestaurantLike(user.userId);
     } else {
-      await restaurant.addUserLike(user.userId, { through: { dateLike: dateLike } });
+      await restaurant.addRestaurantLike(user.userId, { through: { dateLike: dateLike } });
     }
 
     return null;
